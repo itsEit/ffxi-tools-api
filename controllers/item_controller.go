@@ -5,7 +5,9 @@ import (
 	"com/ffxi-tools/models"
 	"com/ffxi-tools/responses"
 	"context"
+	"fmt"
 	"net/http"
+	"strconv"
 	"time"
 
 	"github.com/go-playground/validator/v10"
@@ -15,10 +17,10 @@ import (
 	"go.mongodb.org/mongo-driver/mongo"
 )
 
-var userCollection *mongo.Collection = configs.GetCollection(configs.DB, "users")
-var userValidate = validator.New()
+var itemCollection *mongo.Collection = configs.GetCollection(configs.DB, "gearItems")
+var itemValidate = validator.New()
 
-func CreateUser(c *fiber.Ctx) error {
+func CreateItem(c *fiber.Ctx) error {
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	var user models.User
 	defer cancel()
@@ -29,7 +31,7 @@ func CreateUser(c *fiber.Ctx) error {
 	}
 
 	//use the validator library to validate required fields
-	if validationErr := userValidate.Struct(&user); validationErr != nil {
+	if validationErr := itemValidate.Struct(&user); validationErr != nil {
 		return c.Status(http.StatusBadRequest).JSON(responses.GenericResponse{Status: http.StatusBadRequest, Message: "error", Data: &fiber.Map{"data": validationErr.Error()}})
 	}
 
@@ -47,23 +49,24 @@ func CreateUser(c *fiber.Ctx) error {
 	return c.Status(http.StatusCreated).JSON(responses.GenericResponse{Status: http.StatusCreated, Message: "success", Data: &fiber.Map{"data": result}})
 }
 
-func GetAUser(c *fiber.Ctx) error {
+func GetAItem(c *fiber.Ctx) error {
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
-	userId := c.Params("userId")
-	var user models.User
+	itemId := c.Params("itemId")
+	var item models.Item
 	defer cancel()
 
-	objId, _ := primitive.ObjectIDFromHex(userId)
+	intVar, _ := strconv.Atoi(itemId)
 
-	err := userCollection.FindOne(ctx, bson.M{"id": objId}).Decode(&user)
+	err := itemCollection.FindOne(ctx, bson.M{"_id": intVar}).Decode(&item)
 	if err != nil {
+		fmt.Println(err)
 		return c.Status(http.StatusInternalServerError).JSON(responses.GenericResponse{Status: http.StatusInternalServerError, Message: "error", Data: &fiber.Map{"data": err.Error()}})
 	}
 
-	return c.Status(http.StatusOK).JSON(responses.GenericResponse{Status: http.StatusOK, Message: "success", Data: &fiber.Map{"data": user}})
+	return c.Status(http.StatusOK).JSON(responses.GenericResponse{Status: http.StatusOK, Message: "success", Data: &fiber.Map{"data": item}})
 }
 
-func EditAUser(c *fiber.Ctx) error {
+func EditAItem(c *fiber.Ctx) error {
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	userId := c.Params("userId")
 	var user models.User
@@ -77,7 +80,7 @@ func EditAUser(c *fiber.Ctx) error {
 	}
 
 	//use the validator library to validate required fields
-	if validationErr := userValidate.Struct(&user); validationErr != nil {
+	if validationErr := itemValidate.Struct(&user); validationErr != nil {
 		return c.Status(http.StatusBadRequest).JSON(responses.GenericResponse{Status: http.StatusBadRequest, Message: "error", Data: &fiber.Map{"data": validationErr.Error()}})
 	}
 
@@ -101,7 +104,7 @@ func EditAUser(c *fiber.Ctx) error {
 	return c.Status(http.StatusOK).JSON(responses.GenericResponse{Status: http.StatusOK, Message: "success", Data: &fiber.Map{"data": updatedUser}})
 }
 
-func DeleteAUser(c *fiber.Ctx) error {
+func DeleteAItem(c *fiber.Ctx) error {
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	userId := c.Params("userId")
 	defer cancel()
@@ -124,7 +127,7 @@ func DeleteAUser(c *fiber.Ctx) error {
 	)
 }
 
-func GetAllUsers(c *fiber.Ctx) error {
+func GetAllItems(c *fiber.Ctx) error {
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	var users []models.User
 	defer cancel()
