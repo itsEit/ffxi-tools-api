@@ -4,16 +4,16 @@ import (
 	"com/ffxi-tools/configs"
 	"com/ffxi-tools/routes"
 
-	"github.com/gofiber/fiber/v2"
+	"github.com/gin-gonic/gin"
 )
 
 func main() {
-	app := fiber.New()
+	router := gin.Default()
 
 	configs.ConnectDB()
 
-	routes.UserRoute(app)
-	routes.ItemRoute(app)
+	routes.UserRoute(router)
+	routes.ItemRoute(router)
 
-	app.Listen(":6000")
+	router.Run("localhost:6000")
 }

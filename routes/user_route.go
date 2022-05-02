@@ -3,13 +3,13 @@ package routes
 import (
 	"com/ffxi-tools/controllers"
 
-	"github.com/gofiber/fiber/v2"
+	"github.com/gin-gonic/gin"
 )
 
-func UserRoute(app *fiber.App) {
-	app.Post("/user", controllers.CreateUser)
-	app.Get("/user/:userId", controllers.GetAUser)
-	app.Put("/user/:userId", controllers.EditAUser)
-	app.Delete("/user/:userId", controllers.DeleteAUser)
-	app.Get("/users", controllers.GetAllUsers)
+func UserRoute(router *gin.Engine) {
+	router.POST("/user", controllers.CreateUser())
+	router.GET("/user/:userId", controllers.GetAUser())
+	router.PUT("/user/:userId", controllers.EditAUser())
+	router.DELETE("/user/:userId", controllers.DeleteAUser())
+	router.GET("/users", controllers.GetAllUsers())
 }
