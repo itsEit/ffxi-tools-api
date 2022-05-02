@@ -63,7 +63,7 @@ func GetAItem(c *fiber.Ctx) error {
 		return c.Status(http.StatusInternalServerError).JSON(responses.GenericResponse{Status: http.StatusInternalServerError, Message: "error", Data: &fiber.Map{"data": err.Error()}})
 	}
 
-	return c.Status(http.StatusOK).JSON(responses.GenericResponse{Status: http.StatusOK, Message: "success", Data: &fiber.Map{"data": item}})
+	return c.Status(http.StatusOK).JSON(&fiber.Map{"data": item})
 }
 
 func EditAItem(c *fiber.Ctx) error {
