@@ -16,7 +16,7 @@ import (
 	"go.mongodb.org/mongo-driver/mongo"
 )
 
-var itemCollection *mongo.Collection = configs.GetCollection(configs.DB, "gearItems")
+var itemCollection *mongo.Collection = configs.GetCollection(configs.DB, "ffxi-items")
 var itemValidate = validator.New()
 
 func GetAItem() gin.HandlerFunc {
@@ -34,7 +34,7 @@ func GetAItem() gin.HandlerFunc {
 			return
 		}
 
-		c.JSON(http.StatusOK, responses.GenericResponse{Status: http.StatusOK, Message: "success", Data: map[string]interface{}{"data": item}})
+		c.JSON(http.StatusOK, item)
 	}
 }
 
